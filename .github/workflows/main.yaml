@@ -25,8 +25,11 @@ jobs:
       with:
         ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
+    - name: Add remote server to known hosts
+      run: ssh-keyscan -p 19099 ehr.stalent.cn >> ~/.ssh/known_hosts
+
     - name: Sync to remote server
       run: |
         rsync -avz --progress --delete -e "ssh -p 19099" \
-          dist/*.whl \
+          dist/ \
           chenxueliang@ehr.stalent.cn:/home/chenxueliang/lby/emma/dist/
