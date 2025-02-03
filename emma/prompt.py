@@ -198,6 +198,7 @@ def get_food_info_prompt(userinfo, history):
     1. 你需要识别图片中的食物，并提供食物的名称，如包含多种食物，需要一一列出。
     2. 你需要根据食物的外观和特征，并根据用户的体征或历史数据，猜测用户食用食物的分量（portion），以克为单位。
     3. 用户体征在 <user_info> 标签中给出，格式为 {"weight": float, "height": float, "age": int}。历史数据在 <history> 标签中给出，格式为 {"food": [{'name': string, 'portion': float}]}。
+    4. 如果提供的图片中不包含任何信息，请返回：```{"food": []}```。
 
     <user_info>
     {{ userinfo }}

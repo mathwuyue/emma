@@ -29,4 +29,4 @@ jobs:
       run: |
         rsync -avz --progress --delete -e "ssh -p 19099" \
           dist/*.whl \
-          chenxueliang@ehr.stalant.cn:/home/chenxueliang/lby/emma/dist/
+          chenxueliang@ehr.stalent.cn:/home/chenxueliang/lby/emma/dist/
