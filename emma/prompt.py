@@ -219,16 +219,50 @@ def get_food_info_prompt(userinfo, history):
 
 @prompt
 def get_food_nutrients_prompt(
-    meal_type,
-    guidelines,
-    products,
-    is_userinfo=True,
-    query="请分析这张食物图片并提供营养信息。",
+    food, meal_type, guidelines, products, is_userinfo=True, lang="中文"
 ):
-    """Query: {{ query }}.  meal_type: {{ meal_type }} \n
-    {% if false(is_userinfo) %}
-    User did not provide any information.
-    {% endif %}
+    """You are an nutrition expert. A food list will be given in the format of [{'name': string, 'portion': float}], where name is the food name and portion is the weight of food in gram. You need to analyze the food list and provide the nutrition information following the instructions. Be careful, YOU SHOULD ALWAYS USE the language 中文 to make summary and advice. This is very important to the user.
+
+    ## Food List:
+    {{ food }}
+
+    ## Instructions:
+    1. For each food in the list, use USDA FoodData or other authoritative sources to find the nutrition information, including calories, protein, fat, carbohydrate, folic acid, vitamin c, vitamin d, calcium, iron, zinc and iodine.
+    2. Be aware of the portion of each food, and calculate the nutrition information based on the portion. For example, if the portion is 200g, you have the nutrition information for 100g of the food, you should calculate the nutrition information for 200g of the food, which is double the nutrition information for 100g.
+    3. Sum up the nutrition information of all foods in the list to get the total nutrition information.
+    4. Make summary of food pictures from following aspects:
+        1. Check GI and GL of the food. Point out any high GI and GL food. \n
+        2. Check the meal type given in <mealtype></mealtype> XML tag. 1 is breakfast, 3 is lunch and 5 is dinner. These are main courses, you should check the balance of carb, protein, calories, fibre and vegetables. 2 and 4 are add meals between breakfast and lunch and afternoon tea, you should check fruit, milk and nuts. 6 is the meal before bed.
+        3. Use Guidelines to decide whether too much calories, fat, carbohydrates or sugar.
+    5. Make advice of user provided meal picture considering following aspects: \n
+        1. Check calories, protein, fat, carb, folic acid, vitamine c, vitamine d, calcium, iron, zinc and iodine and see whether they meet the guidelines one by one. \n
+        2. Low GI and GL food. \n
+        3. Check Products given in <product></product> XML tags, and recommend to user one or more products that meet her requirement. \n
+        4. If user follows all the guidelines, encourage user to follow the dietary given by you and keep good habit. \n
+        Your should think step by step likes following examples: \n
+        <example>
+        [Check] User take 10mcg folic acid in the meal. [Guideline] User should take 60mcg/day. [Advice] User should take more livers, as it contains much folic acid. But also, please try Folic Acid Tablet, if you do not like livers and the Folic Acid Tablets can help you better. \n
+        </example>
+    6.  If ```User did not provide any information```, before summary and advice, you should tell user the assumption ```As you haven't input your personal data likes weight and etc., the summarh / advice is based on following assumption: your bmi is 18.9, you weight before pregnant is 58kg and you are in your 1st trimester```. This is very important to the user. \n
+    7. When making summary and advice, be concise and friendly. Remember, even if the meal does not follow guidelines, you should still be friendly and encouraging. \n
+    8. Return only a JSON with this exact structure:
+    ```json
+            {
+            "foods": [{'food': string, 'count': float}],
+            "nutritients": [{
+                "macro": {"calories": float, "protein": float, "fat": float, "carb": float},
+                "micro": {"fa": float, "vc": float, "vd": float},
+                "mineral": {"calcium": float, "iron": float, "zinc": float, "iodine": float}
+            }],
+            "summary": "Summary goes here",
+            "advice": "Advice goes here"
+            }
+    ```
+    # mealtype
+    <mealtype> \n
+    {{ meal_type }} \n
+    </mealtype> \n
+
     Tools: \n
     1. USDA FoodData: You search USDA National Nutrient Database for Standard Reference, and find calories, protein, fat, carb, folic acid, vitamine c, vitamine d, calcium, iron, zinc and iodine information of a food. \n
     2. GI and GL: You can search the database and get the glycemic index (GI) and glycemic load (GL) of a food. \n
@@ -243,40 +277,6 @@ def get_food_nutrients_prompt(
     <product> \n
     {{ products }}
     </product>\n
-
-    # Workflows: \n
-    Follow the steps below to analyze the food image and provide the nutrition information. \n
-    1. Identify different food items in the image and count the number of items. \n
-    2. For each item, use USDA FoodData to find calories, protein, fat, carb, folic acid, vitamine c, vitamine d, calcium, iron, zinc and iodine information. \n
-    3. Count the total nutrition information calories, protein, fat, carb, folic acid, vitamine c, vitamine d, calcium, iron, zinc and iodine: sum(food item nutrition * number of food item). \n
-    4. Make summary of food pictures from following aspects:
-        1. Check GI and GL of the food. Point out any high GI and GL food. \n
-        2. Check the meal type. 1 is breakfast, 3 is lunch and 5 is dinner. These are main courses, you should check the balance of carb, protein, calories, fibre and vegetables. 2 and 4 are add meals between breakfast and lunch and afternoon tea, you should check fruit, milk and nuts. 6 is the meal before bed.
-        3. Use Guidelines to decide whether too much calories, fat, carbohydrates or sugar.
-    5. Make advice of user provided meal picture considering following aspects: \n
-        1. Check calories, protein, fat, carb, folic acid, vitamine c, vitamine d, calcium, iron, zinc and iodine and see whether they meet the guidelines one by one. \n
-        2. Low GI and GL food. \n
-        3. Check Products given in <product></product> XML tags, and recommend to user one or more products that meet her requirement. \n
-        4. If user follows all the guidelines, encourage user to follow the dietary given by you and keep good habit. \n
-        Your should think step by step likes following examples: \n
-        <example>
-        [Check] User take 10mcg folic acid in the meal. [Guideline] User should take 60mcg/day. [Advice] User should take more livers, as it contains much folic acid. But also, please try Folic Acid Tablet, if you do not like livers and the Folic Acid Tablets can help you better. \n
-        </example>
-    6.  If ```User did not provide any information```, before summary and advice, you should tell user the assumption ```As you haven't input your personal data likes weight and etc., the summarh / advice is based on following assumption: your bmi is 18.9, you weight before pregnant is 58kg and you are in your 1st trimester```. This is very important to the user. \n
-    7. When making summary and advice, be concise and friendly and in the same language as query. Remember, even if the meal does not follow guidelines, you should still be friendly and encouraging. \n
-    8. Return only a JSON with this exact structure:
-    ```json
-            {
-            "foods": [{'food': string, 'count': float}],
-            "nutritients": [{
-                "macro": {"calories": float, "protein": float, "fat": float, "carb": float},
-                "micro": {"fa": float, "vc": float, "vd": float},
-                "mineral": {"calcium": float, "iron": float, "zinc": float, "iodine": float}
-            }],
-            "summary": "Summary goes here",
-            "advice": "Advice goes here"
-            }
-    ```
     """
 
 

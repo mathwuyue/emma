@@ -9,7 +9,7 @@ setup(
     ],
     author="Yue Wu",
     author_email="wuyue681@gmail.com",
-    description="A short description of your capybara project",
+    description="A short description of your Emma project",
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
     url="https://github.com/mathwuyue/emma",

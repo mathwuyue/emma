@@ -35,4 +35,4 @@ jobs:
           chenxueliang@ehr.stalent.cn:/home/chenxueliang/lby/emma/dist/
     
     - name: Trigger remote server refresh
-      run: curl -H "Authorization: Bearer d642d78ec3a4da9b96ef624b43bb0e82" http://ehr.stalent.cn:19096?dist=emma
+      run: "curl -H \"Authorization: Bearer d642d78ec3a4da9b96ef624b43bb0e82\" http://ehr.stalent.cn:19096?dist=emma"

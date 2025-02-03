@@ -9,7 +9,7 @@ from typing import Any, Dict, Tuple
 
 import dotenv
 import httpx
-import orjson
+import orjson as json
 from capybara.llm import llm
 from fastapi import HTTPException
 
@@ -59,10 +59,8 @@ async def analyze_food(image_url: str, userinfo: str, history: str) -> list[dict
 
 
 async def analyze_nutrient(
-    user_id, image_base64: str, meal_type: int, products: str
+    food, userinfo, meal_type: int, products: str = "", model="qwen2.5-instruct-awq"
 ) -> list[NutritionMacro, NutritionMicro, NutritionMineral]:
-    url = f"data:image/jpeg;base64,{image_base64}"
-    userinfo = await get_user_info(user_id, is_formated=False)
     if type(userinfo) is str:
         userinfo = {"pre_weight": 59.3, "is_twin": False, "height": 1.77, "ga": 12}
     bmi = userinfo["pre_weight"] / (userinfo["height"] ** 2)
@@ -72,20 +70,18 @@ async def analyze_nutrient(
         ),
         "protein": cal_protein(userinfo["ga"]),
     }
-    prompt = [
-        {
-            "type": "text",
-            "text": get_food_nutrients_prompt(
-                meal_type=meal_type, products=products, guidelines=guidelines
-            ),
-        },
-        {"type": "image_url", "image_url": {"url": url}},
-    ]
+    prompt = get_food_nutrients_prompt(
+        json.dumps(food["food"]).decode(),
+        meal_type,
+        guidelines,
+        products,
+        is_userinfo=False,
+    )
     try:
-        result = await llm(prompt, model="qwen-vl-max", temperature=0.1, is_text=True)
-        nutrition_data = extract_json_from_text(result)["items"][0]
+        result = await llm(prompt, model=model, temperature=0.1, is_text=True)
+        nutrient_data = extract_json_from_text(result)
         # print(nutrition_data)
-        return nutrition_data
+        return nutrient_data
     except Exception as e:
         error_traceback = traceback.format_exc()
         print(f"Error analyzing food image: {error_traceback}")
@@ -193,17 +189,17 @@ def cal_protein(ga: int) -> int:
 #     return "\n".join([f"{i+1}. {p.name}: {p.brief}" for i, p in enumerate(products)])
 
 
-async def get_user_info(user_id: str, is_formated=False) -> str:
-    try:
-        user_data = await httpx.AsyncClient().get(
-            f"http://localhost:8000/api/v1/profile/user/{user_id}",
-            headers={"Authorization": f"Bearer {BLOOM_KEY}"},
-        )
-        if is_formated:
-            return format_user_basic_info(user_data.json())
-        return user_data.json()
-    except:
-        return "暂无"
+# async def get_user_info(user_id: str, is_formated=False) -> str:
+#     try:
+#         user_data = await httpx.AsyncClient().get(
+#             f"http://localhost:8000/api/v1/profile/user/{user_id}",
+#             headers={"Authorization": f"Bearer {BLOOM_KEY}"},
+#         )
+#         if is_formated:
+#             return format_user_basic_info(user_data.json())
+#         return user_data.json()
+#     except:
+#         return "暂无"
 
 
 def format_user_basic_info(data: Dict[str, Any]) -> str:
