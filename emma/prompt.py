@@ -249,11 +249,11 @@ def get_food_nutrients_prompt(
     ```json
             {
             "foods": [{'food': string, 'count': float}],
-            "nutritients": [{
+            "nutrients": {
                 "macro": {"calories": float, "protein": float, "fat": float, "carb": float},
                 "micro": {"fa": float, "vc": float, "vd": float},
                 "mineral": {"calcium": float, "iron": float, "zinc": float, "iodine": float}
-            }],
+            },
             "summary": "Summary goes here",
             "advice": "Advice goes here"
             }
