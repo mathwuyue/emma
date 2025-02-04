@@ -618,6 +618,23 @@ def emma_exercise_summary(
 
 
 @prompt
+def get_exercise_info(lang="中文"):
+    """
+    You will be given a picture. The picture may contain the information of heart rate, exercise duration and blood oxygen saturation level. \n
+    You should extract these information from the picture. \n
+
+    ## Instructions
+    1. Try to extract the heart rate. The heart rate may be labeled as bpm, PRbpm, beats per minute, 心率, 每分钟跳动 or other words you may know. You should try to get those keywords then extract the number. If you don't find this information, set as 0. \n
+    2. Try to extract the exercise duration. The exercise duration may be labeled as duration, 持续时间, 运动时长, 时长 or other words you may know. You should try to get those keywords then extract the number. If you don't find this information, set as 0. \n
+    3. Try to extract the blood oxygen saturation level. The blood oxygen saturation level may be labeled as blood oxygen saturation, oxygen saturation, SO2, SpO2%, %SpO2, 血氧饱和度, 血氧 or other words you may know. You should try to get those keywords then extract the number. If you don't find this information, set as 0.\n
+    4. Return format: \n
+    ```json
+    {"heart_rate": int, "exercise_duration": int, "blood_oxygen_saturation": int}
+    ```
+    """
+
+
+@prompt
 def user_preference_summary(food_preference):
     """
     Given the user's food preference in the format of a json: \n

@@ -4,8 +4,8 @@ Core module for the Emma Nutrition application.
 
 import os
 import traceback
-from datetime import datetime, timedelta
-from typing import Any, Dict, Tuple
+from datetime import datetime
+from typing import Any, Dict
 
 import dotenv
 import httpx
@@ -14,24 +14,9 @@ from capybara.llm import llm
 from fastapi import HTTPException
 
 from ..logger import logger
-from ..prompt import (
-    emma_exercise_summary,
-    emma_glu_summary,
-    get_food_info_prompt,
-    get_food_nutrients_prompt,
-    user_preference_summary,
-)
+from ..prompt import emma_glu_summary, get_food_info_prompt, get_food_nutrients_prompt
 from ..utils import extract_json_from_text
-from .model import (
-    DietaryData,
-    DietarySummary,
-    EmmaComment,
-    NutritionMacro,
-    NutritionMicro,
-    NutritionMineral,
-    UserBasicInfo,
-    UserPreferenceData,
-)
+from .model import NutritionMacro, NutritionMicro, NutritionMineral, UserBasicInfo
 
 dotenv.load_dotenv()
 BLOOM_KEY = os.getenv("BLOOM_KEY")
