@@ -305,21 +305,3 @@ async def get_glu_summary(user_id: str) -> list:
 
 def get_fitness_data():
     pass
-
-
-def format_exercise_records(previous_records) -> dict:
-    """Format ExerciseData records into standardized JSON structure"""
-    formatted_data = []
-
-    for record in previous_records:
-        formatted_data.append(
-            {
-                "datetime": record.created_at.strftime("%Y-%m-%d %H:%M:%S"),
-                "exercise": record.exercise,
-                "intensity": record.intensity,
-                "duration": record.duration,
-                "calories": float(record.calories),
-            }
-        )
-
-    return {"total": len(formatted_data), "data": formatted_data}

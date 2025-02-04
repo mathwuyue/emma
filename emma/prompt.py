@@ -627,9 +627,15 @@ def get_exercise_info(lang="中文"):
     1. Try to extract the heart rate. The heart rate may be labeled as bpm, PRbpm, beats per minute, 心率, 每分钟跳动 or other words you may know. You should try to get those keywords then extract the number. If you don't find this information, set as 0. \n
     2. Try to extract the exercise duration. The exercise duration may be labeled as duration, 持续时间, 运动时长, 时长 or other words you may know. You should try to get those keywords then extract the number. If you don't find this information, set as 0. \n
     3. Try to extract the blood oxygen saturation level. The blood oxygen saturation level may be labeled as blood oxygen saturation, oxygen saturation, SO2, SpO2%, %SpO2, 血氧饱和度, 血氧 or other words you may know. You should try to get those keywords then extract the number. If you don't find this information, set as 0.\n
-    4. Return format: \n
+    4. If some information is still missing, take a deep breath and review the picture. Think step by step and make best guess. Some rules are: \n
+        - The heart rate is most likely between 100 and 140. \n
+        - The exercise duration is most likely between 30 and 60 minutes. \n
+        - The blood oxygen saturation level is most likely between 90 and 100. \n
+        - If you find only one number, always consider it as the heart rate. \n
+        - When you make guess, you should always be careful, make sure the number is not related to other information. \n
+    5. Return format: \n
     ```json
-    {"heart_rate": int, "exercise_duration": int, "blood_oxygen_saturation": int}
+    {"heart_rate": int, "exercise_duration": int, "spo2": int}
     ```
     """
 
