@@ -213,76 +213,66 @@ def format_user_basic_info(data: Dict[str, Any]) -> str:
     return "\n".join(formatted)
 
 
-# def get_meal_data(user_id: str, date: datetime, offset: int) -> list[MealData]:
-#     start_date = date - timedelta(days=offset)
-#     meals = MealData.select(
-#         MealData.type, MealData.food, MealData.nutrient, MealData.created_at
-#     ).where(
-#         (MealData.userid == user_id) & (MealData.created_at.between(start_date, date))
-#     )
-#     return meals
+def calculate_nutrient_per_day(meals) -> dict:
+    """
+    Get 7 days meal record to calculate the nutrition from food per day
+    """
+    # get meal data
+    # meals = get_meal_data(user_id, date, 7)
+    # group them by date
+    # Group meals by day
+    daily_totals = {}
 
+    for meal in meals:
+        # Truncate datetime to day
+        day = meal.created_at.date()
 
-# def calculate_nutrition_per_day(user_id: str, date: datetime) -> dict:
-#     """
-#     Get 7 days meal record to calculate the nutrition from food per day
-#     """
-#     # get meal data
-#     meals = get_meal_data(user_id, date, 7)
-#     # group them by date
-#     # Group meals by day
-#     daily_totals = {}
-
-#     for meal in meals:
-#         # Truncate datetime to day
-#         day = meal.created_at.date()
-
-#         if day not in daily_totals:
-#             daily_totals[day] = {
-#                 "macro": NutritionMacro(calories=0, protein=0, fat=0, carb=0),
-#                 "micro": NutritionMicro(fa=0, vc=0, vd=0),
-#                 "mineral": NutritionMineral(calcium=0, iron=0, zinc=0, iodine=0),
-#             }
-#         # Add nutrients from current meal
-#         nutrients = meal.nutrient
-#         macro = nutrients["macro"]
-#         micro = nutrients["micro"]
-#         mineral = nutrients["mineral"]
-#         # Sum macro nutrients
-#         daily_totals[day]["macro"].calories += macro.get("calories", 0)
-#         daily_totals[day]["macro"].protein += macro.get("protein", 0)
-#         daily_totals[day]["macro"].fat += macro.get("fat", 0)
-#         daily_totals[day]["macro"].carb += macro.get("carb", 0)
-#         # Sum micro nutrients
-#         daily_totals[day]["micro"].fa += micro.get("fa", 0)
-#         daily_totals[day]["micro"].vc += micro.get("vc", 0)
-#         daily_totals[day]["micro"].vd += micro.get("vd", 0)
-#         # Sum minerals
-#         daily_totals[day]["mineral"].calcium += mineral.get("calcium", 0)
-#         daily_totals[day]["mineral"].iron += mineral.get("iron", 0)
-#         daily_totals[day]["mineral"].zinc += mineral.get("zinc", 0)
-#         daily_totals[day]["mineral"].iodine += mineral.get("iodine", 0)
-#     # Format output string
-#     output = []
-#     for day, nutrients in sorted(daily_totals.items()):
-#         macro = nutrients["macro"]
-#         micro = nutrients["micro"]
-#         mineral = nutrients["mineral"]
-#         # final string
-#         day_str = f"Day {day.strftime('%m-%d')}: "
-#         day_str += f"Calories {macro.calories:.1f}g, "
-#         day_str += f"Protein {macro.protein:.1f}g, "
-#         day_str += f"Fat {macro.fat:.1f}g, "
-#         day_str += f"Carb {macro.carb:.1f}g, "
-#         day_str += f"Folic Acid {micro.fa:.1f}mcg, "
-#         day_str += f"VitC {micro.vc:.1f}mg, "
-#         day_str += f"VitD {micro.vd:.1f}mcg, "
-#         day_str += f"Calcium {mineral.calcium:.1f}mg, "
-#         day_str += f"Iron {mineral.iron:.1f}mg, "
-#         day_str += f"Zinc {mineral.zinc:.1f}mg, "
-#         day_str += f"Iodine {mineral.iodine:.1f}mcg"
-#         output.append(day_str)
-#     return "".join(output)
+        if day not in daily_totals:
+            daily_totals[day] = {
+                "macro": NutritionMacro(calories=0, protein=0, fat=0, carb=0),
+                "micro": NutritionMicro(fa=0, vc=0, vd=0),
+                "mineral": NutritionMineral(calcium=0, iron=0, zinc=0, iodine=0),
+            }
+        # Add nutrients from current meal
+        nutrients = meal.nutrient
+        macro = nutrients["macro"]
+        micro = nutrients["micro"]
+        mineral = nutrients["mineral"]
+        # Sum macro nutrients
+        daily_totals[day]["macro"].calories += macro.get("calories", 0)
+        daily_totals[day]["macro"].protein += macro.get("protein", 0)
+        daily_totals[day]["macro"].fat += macro.get("fat", 0)
+        daily_totals[day]["macro"].carb += macro.get("carb", 0)
+        # Sum micro nutrients
+        daily_totals[day]["micro"].fa += micro.get("fa", 0)
+        daily_totals[day]["micro"].vc += micro.get("vc", 0)
+        daily_totals[day]["micro"].vd += micro.get("vd", 0)
+        # Sum minerals
+        daily_totals[day]["mineral"].calcium += mineral.get("calcium", 0)
+        daily_totals[day]["mineral"].iron += mineral.get("iron", 0)
+        daily_totals[day]["mineral"].zinc += mineral.get("zinc", 0)
+        daily_totals[day]["mineral"].iodine += mineral.get("iodine", 0)
+    # Format output string
+    output = []
+    for day, nutrients in sorted(daily_totals.items()):
+        macro = nutrients["macro"]
+        micro = nutrients["micro"]
+        mineral = nutrients["mineral"]
+        # final string
+        day_str = f"Day {day.strftime('%m-%d')}: "
+        day_str += f"Calories {macro.calories:.1f}g, "
+        day_str += f"Protein {macro.protein:.1f}g, "
+        day_str += f"Fat {macro.fat:.1f}g, "
+        day_str += f"Carb {macro.carb:.1f}g, "
+        day_str += f"Folic Acid {micro.fa:.1f}mcg, "
+        day_str += f"VitC {micro.vc:.1f}mg, "
+        day_str += f"VitD {micro.vd:.1f}mcg, "
+        day_str += f"Calcium {mineral.calcium:.1f}mg, "
+        day_str += f"Iron {mineral.iron:.1f}mg, "
+        day_str += f"Zinc {mineral.zinc:.1f}mg, "
+        day_str += f"Iodine {mineral.iodine:.1f}mcg"
+        output.append(day_str)
+    return "".join(output)
 
 
 async def get_glu_summary(user_id: str) -> list:

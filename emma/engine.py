@@ -10,17 +10,18 @@ from typing import Any, AsyncGenerator, Dict
 
 import dotenv
 import redis
-from pydantic import BaseModel
+from capybara.agent import AgentConfig, ChatAgent, NullAgent
+from capybara.llm import llm
+from capybara.router import RouterOptions, UserIntentionRouter
 
-from agent.agent import AgentConfig, ChatAgent, NullAgent
-from llm import llm
-from nutrition.emma import (
-    calculate_nutrition_per_day,
-    get_glu_summary,
-    get_products,
-    get_user_info,
-    get_user_preference_summary,
-)
+# from health.nutrient import (
+#     calculate_nutrition_per_day,
+#     get_glu_summary,
+#     get_products,
+#     get_user_info,
+#     get_user_preference_summary,
+# )
+from health.nutrient import calculate_nutrient_per_day
 from prompt import (
     emma_chat,
     emma_fitness,
@@ -28,7 +29,7 @@ from prompt import (
     emma_future,
     emma_nutrition,
 )
-from router import RouterOptions, UserIntentionRouter
+from pydantic import BaseModel
 from utils import extract_json_from_text
 
 dotenv.load_dotenv()
@@ -68,7 +69,7 @@ options = RouterOptions(options=user_intents)
 
 
 async def workflow(
-    query: Query, config: str, websocket
+    query: Query, config: str, **kwargs
 ) -> AsyncGenerator[Dict[str, Any], None]:
     # TODO: event_id should be generated only for a new conversation
     r = redis.Redis()
@@ -101,12 +102,13 @@ async def workflow(
         emma_dietary_agent = ChatAgent(
             AgentConfig(user_id=config["user_id"], session_id=config["session_id"])
         )
-        context = {
-            "userinfo": await get_user_info(config["user_id"], is_formated=True),
-            "food_preference": await get_user_preference_summary(config["user_id"]),
-            "glu_summary": await get_glu_summary(config["user_id"]),
-            "products": get_products(),
-        }
+        # context = {
+        #     "userinfo": kwargs.get("userinfo"),
+        #     "food_preference": kwargs.get("food_preference", ""),
+        #     "glu_summary": kwargs.get("glu_summary", ""),
+        #     "products": kwargs.get("products", ""),
+        # }
+        context = {}
         async for chunk in emma_dietary_agent.act(
             question, 0, "default", emma_nutrition, context, stream=False
         ):
@@ -122,15 +124,16 @@ async def workflow(
         emma_format_agent = ChatAgent(
             AgentConfig(user_id=config["user_id"], session_id=config["session_id"])
         )
-        context = {
-            "userinfo": await get_user_info(config["user_id"], is_formated=True),
-            "food_preference": await get_user_preference_summary(config["user_id"]),
-            "glu_summary": await get_glu_summary(config["user_id"]),
-            "meal": calculate_nutrition_per_day(
-                config["user_id"], datetime.datetime.now()
-            ),
-            "products": get_products(),
-        }
+        # context = {
+        #     "userinfo": kwargs.get("userinfo"),
+        #     "food_preference": kwargs.get("food_preference", ""),
+        #     "glu_summary": kwargs.get("glu_summary", ""),
+        #     "meal": calculate_nutrient_per_day(
+        #         config["user_id"], datetime.datetime.now()
+        #     ),
+        #     "products": kwargs.get("products", ""),
+        # }
+        context = {}
         async for chunk in emma_nutrition_agent.act(
             question, 0, "default", emma_nutrition, context
         ):
@@ -150,7 +153,8 @@ async def workflow(
         emma_future_agent = ChatAgent(
             AgentConfig(user_id=config["user_id"], session_id=config["session_id"])
         )
-        userinfo = await get_user_info(config["user_id"])
+        # userinfo = kwargs.get("userinfo")
+        userinfo = "暂无"
         # Extract gestational age from userinfo
         if type(userinfo) is str:
             ga_weeks = 12
@@ -174,7 +178,8 @@ async def workflow(
         emma_agent = ChatAgent(
             AgentConfig(user_id=config["user_id"], session_id=config["session_id"])
         )
-        userinfo = await get_user_info(config["user_id"])
+        # userinfo = kwargs.get("userinfo")
+        userinfo = "暂无"
         if config["is_thought"]:
             async for chunk in emma_agent.act(
                 question, 0, "default", emma_fitness, stream=True
