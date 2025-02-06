@@ -31,14 +31,6 @@ dotenv.load_dotenv()
 model = os.getenv("MODEL")
 
 
-# ONLY FOR TESTING. REMOVE IN PRODUCTION
-curr_path = os.path.dirname(os.path.abspath(__file__))
-root_path = os.path.dirname(curr_path)
-test_file = os.path.join(root_path, "test", "test_resp.txt")
-with open(test_file, "r") as f:
-    TEST_CONTENT = f.read()
-
-
 class Query(BaseModel):
     role: str
     content: str
