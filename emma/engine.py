@@ -8,13 +8,6 @@ import redis
 from capybara.agent import AgentConfig, ChatAgent, NullAgent
 from capybara.llm import llm
 from capybara.router import RouterOptions, UserIntentionRouter
-from prompt import (
-    emma_chat,
-    emma_fitness,
-    emma_format_chat,
-    emma_future,
-    emma_nutrition,
-)
 from pydantic import BaseModel
 from utils import extract_json_from_text
 
@@ -26,6 +19,13 @@ from utils import extract_json_from_text
 #     get_user_preference_summary,
 # )
 from .health.nutrient import calculate_nutrient_per_day
+from .prompt import (
+    emma_chat,
+    emma_fitness,
+    emma_format_chat,
+    emma_future,
+    emma_nutrition,
+)
 
 dotenv.load_dotenv()
 model = os.getenv("MODEL")
