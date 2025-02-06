@@ -1,9 +1,4 @@
 import os
-import sys
-
-sys.path.append(os.path.abspath(".."))
-
-import datetime
 import time
 import uuid
 from typing import Any, AsyncGenerator, Dict
@@ -13,15 +8,6 @@ import redis
 from capybara.agent import AgentConfig, ChatAgent, NullAgent
 from capybara.llm import llm
 from capybara.router import RouterOptions, UserIntentionRouter
-
-# from health.nutrient import (
-#     calculate_nutrition_per_day,
-#     get_glu_summary,
-#     get_products,
-#     get_user_info,
-#     get_user_preference_summary,
-# )
-from health.nutrient import calculate_nutrient_per_day
 from prompt import (
     emma_chat,
     emma_fitness,
@@ -31,6 +17,15 @@ from prompt import (
 )
 from pydantic import BaseModel
 from utils import extract_json_from_text
+
+# from health.nutrient import (
+#     calculate_nutrition_per_day,
+#     get_glu_summary,
+#     get_products,
+#     get_user_info,
+#     get_user_preference_summary,
+# )
+from .health.nutrient import calculate_nutrient_per_day
 
 dotenv.load_dotenv()
 model = os.getenv("MODEL")
