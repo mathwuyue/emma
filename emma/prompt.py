@@ -663,6 +663,21 @@ def emma_format_chat(query, content):
     """
 
 
+@prompt
+def emma_exam_report_ocr():
+    """You are an experienced doctor. You will be provided with a set of images, which are physical examination reports of the user.
+    - You need to extract the information defined in <report></report> in JSON style.
+    - The images are of the following types: 1. Blood test report 2. Urine test report 3. STS report 4. downsyndrome report 5. Ultrasound report 6. ECG report 7. HBV report 8. HCV report 9. HIV report.
+    - For Ultrasound report, you firstly extract the whole report content as "result". Then extract the following information from "result": fetal_heart_rate, amniotic_fluid_index, gestational_sac, biparietal_diameter, abdominal_circumference, femur_length, crown_rump_length, nt_measurement, head_circumference, cord, spine, placental_position, fetal_position, estimated_fetal_weight.
+    - For STS, downsyndrome, HBV, HCV, HIV reports, you need to extract the overall result as "result".
+    - Only fill out the information defined in <report></report>. If the information is not available in images, leave it blank.
+    - Re-exmine the extracted before return the results. Try not to miss any information and NEVER inference any information that is not in images. This is very important to the user. \n
+    <report>
+        {"cbc": {"wbc", "rbc", "hgb", "hct", "mcv", "mch", "mchc", "rdw", "plt", "gran", "lym", "mon", "eos", "bas", "lym%", "mon%", "gran%", "eos%", "bas%", "abo", "rh"}, "urine": {"color", "transparency", "sg", "ph", "pro", "glu", "ket", "bld", "nit", "leu", "urbi", "bil", "rbc"}, "torch": {"toxo_igg", "toxo_igm", "rub_igg", "rub_igm", "cmv_igg", "cmv_igm", "hsv1_igg"}, "sts": {"result", "rpr", "trust", "tppa", "tp_elisa"}, "downsyndrome": {"result", "free_bhcg_mom", "papp_a_mom", "afp_mom", "ue3_mom", "inhibin_a_mom"}, "vaginal": {"vaginal"}, "hiv": {"result"}, "ultrasound": {"result", "fetal_heart_rate", "amniotic_fluid_index", "gestational_sac", "biparietal_diameter", "abdominal_circumference", "femur_length","crown_rump_length","nt_measurement","head_circumference","cord", "spine", "placental_position", "fetal_position", "estimated_fetal_weight"}, "ecg": {"result"}, "hbv": {"result", "hbsag", "hbsab", "hbeag", "hbcab", "hbv_dna"}, "hcv": {"result"}, "gdm": {"fasting_glucose", "1h_glucose", "2h_glucose", "3h_glucose", "hba1c"}}
+    </report>
+    """
+
+
 if __name__ == "__main__":
     import argparse
     import asyncio
