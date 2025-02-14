@@ -1,11 +1,11 @@
 from capybara.llm import llm
 
-from ..prompt import exam_report_prompt
+from ..prompt import exam_report_ocr_prompt
 from ..utils import extract_json_from_text
 
 
 async def exam_report_ocr(pic_urls: list) -> str:
-    prompt = exam_report_ocr()
+    prompt = exam_report_ocr_prompt()
     query = [{"type": "text", "text": prompt}] + [
         {
             "type": "image_url",

@@ -664,7 +664,7 @@ def emma_format_chat(query, content):
 
 
 @prompt
-def emma_exam_report_ocr():
+def exam_report_ocr_prompt():
     """You are an experienced doctor. You will be provided with a set of images, which are physical examination reports of the user.
     - You need to extract the information defined in <report></report> in JSON style.
     - The images are of the following types: 1. Blood test report 2. Urine test report 3. STS report 4. downsyndrome report 5. Ultrasound report 6. ECG report 7. HBV report 8. HCV report 9. HIV report.
