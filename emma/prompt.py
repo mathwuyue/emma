@@ -668,7 +668,9 @@ def exam_report_ocr_prompt():
     """You are an experienced doctor. You will be provided with a set of images, which are physical examination reports of the user.
     - You need to extract the information defined in <report></report> in JSON style.
     - The images are of the following types: 1. Blood test report 2. Urine test report 3. STS report 4. downsyndrome report 5. Ultrasound report 6. ECG report 7. HBV report 8. HCV report 9. HIV report.
-    - For Ultrasound report, you firstly extract the whole report content as "result". Then extract the following information from "result": fetal_heart_rate, amniotic_fluid_index, gestational_sac, biparietal_diameter, abdominal_circumference, femur_length, crown_rump_length, nt_measurement, head_circumference, cord, spine, placental_position, fetal_position, estimated_fetal_weight.
+    - For Ultrasound report, you firstly extract the whole report content as "result". Then extract the following information from "result": fetal_heart_rate (in beats per minute), amniotic_fluid_index, gestational_sac in mm, biparietal_diameter in mm, abdominal_circumference in mm, femur_length in mm, crown_rump_length in mm, nt_measurement in mm, head_circumference in mm, cord, spine, placental_position, fetal_position, estimated_fetal_weight in g.
+    - For all numerical values, you should extract the value and turn it into correct unit. For example, if femur_length is 3.6cm, you should extract it as 36.
+    - Only fill the number into the numerical values. Do not include the unit in the extracted value.
     - For STS, downsyndrome, HBV, HCV, HIV reports, you need to extract the overall result as "result".
     - Only fill out the information defined in <report></report>. If the information is not available in images, leave it blank.
     - Re-exmine the extracted before return the results. Try not to miss any information and NEVER inference any information that is not in images. This is very important to the user. \n
