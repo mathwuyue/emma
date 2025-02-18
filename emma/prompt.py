@@ -12,9 +12,10 @@ from jinja2 import Template
 def prompt(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
-        signature = inspect.signature(func)
-        context = dict(zip(signature.parameters.keys(), args))
-        context.update(kwargs)
+        sig = inspect.signature(func)
+        bound = sig.bind_partial(*args, **kwargs)
+        bound.apply_defaults()
+        context = bound.arguments
         template_str = func.__doc__
         template = Template(template_str)
         return template.render(context)
@@ -221,7 +222,7 @@ def get_food_info_prompt(userinfo, history):
 def get_food_nutrients_prompt(
     food, meal_type, guidelines, products, is_userinfo=True, lang="中文"
 ):
-    """You are an nutrition expert. A food list will be given in the format of [{'name': string, 'portion': float}], where name is the food name and portion is the weight of food in gram. You need to analyze the food list and provide the nutrition information following the instructions. Be careful, YOU SHOULD ALWAYS USE the language 中文 to make summary and advice. This is very important to the user.
+    """You are an nutrition expert. A food list will be given in the format of [{'name': string, 'portion': float}], where name is the food name and portion is the weight of food in gram. You need to analyze the food list and provide the nutrition information following the instructions. Be careful, YOU SHOULD ALWAYS USE the language {{ lang }} to make summary and advice. This is very important to the user.
 
     ## Food List:
     {{ food }}
