@@ -75,7 +75,9 @@ async def get_exercise_summary(
     calories = cal_calories_met(
         float(user_data.cur_weight), float(duration), float(met)
     )
-    conditions = f"{user_data.condition} (Level {user_data.cond_level})"
+    conditions = ", ".join(
+        [f"{c.condition} (Level {c.cond_level})" for c in user_data.conditions]
+    )
     new_record = {
         "exercise": exercise,
         "intensity": intensity,
