@@ -571,7 +571,14 @@ def emma_glu_summary(glucose_records):
 
 @prompt
 def emma_exercise_summary(
-    exercise, exercise_records, weight, ga, conditions, complications, exercise_bpm
+    exercise,
+    exercise_records,
+    weight,
+    ga,
+    conditions,
+    complications,
+    exercise_bpm,
+    lang="中文",
 ):
     """
     User is a pregnant woman in {{ ga }} weeks. \n
@@ -609,7 +616,7 @@ def emma_exercise_summary(
     Your response should contains both summary and advice. \n
     Your summary should be in a concise language no more than 100 words. \n
     If user's exercise violates the guidelines, you should provide the advice within 100 words for the user to adjust exercise plan. If not, advice user to keep the good work. The advice should always be cherish and encourage user to keep exercise regulary. \n
-    The summary and advice should be in the language as the dialogue and in Json format
+    The summary and advice should be in the language {{ lang }} and in JSON format
 
     ```json
     {"summary": "string", "advice": "string", "calories": calories}
