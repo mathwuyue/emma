@@ -573,6 +573,7 @@ def emma_glu_summary(glucose_records):
 @prompt
 def emma_exercise_summary(
     exercise,
+    met,
     exercise_records,
     weight,
     ga,
@@ -590,9 +591,9 @@ def emma_exercise_summary(
     ```
     Here is the user's comment of her exercise: ```{{ exercise['remark'] }}``` \n
     The heart rate after user's exercise: {{ exercise['bpm'] }}. If it is 0.0, user did not provide the information.
-    If the given calories is 0, search for the Metabolic Equivalent of the {{ exercise }} with the {{ intensity }} as [MET] and calculate the calories as: \n
+    If the given calories is 0, calculate the calories as: \n
     ```python
-    calories = MET * {{ weight }} * 1.05 * {{ duration }} / 60
+    calories = 0.0175 * {{ met }} * {{ weight }} * 1.05 * {{ exercise['duration'] }}
     ```
     Given the user's a week's exercise records in json format ```{"total": int, "data": [{"datetime": date, "exercise": str, "intensity": int, "duration": int, "calories": float}]}```, intensity in the json data represents the intensity of the exercise, gentle, low, normal and high. \n
     Here is the user's exercise records: \n
