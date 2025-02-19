@@ -101,7 +101,6 @@ async def get_exercise_summary(
         user_data.complications,
         {"min": min_bpm, "max": max_bpm},
     )
-    print(prompt)
     llm_json = extract_json_from_text(await llm(prompt, is_text=True))
     if not calories:
         calories = llm_json["calories"]

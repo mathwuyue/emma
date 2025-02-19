@@ -12,8 +12,8 @@ def macronutrient_guideline(calories: int, trimester: int):
     guideline = f"""
         Should intake {calories} kcal/day, {protein} g protein/day, 70 g fat/day, 150 to 175 g carb/day"""
     return guideline
-        
-        
+
+
 def wz_guideline():
     """ Return the guideline for the nutrition module """
     guideline = """
@@ -38,13 +38,13 @@ def salt_oil_guideline():
     return """
         1. 每天食用适量的食用油，每次食用10g，大约是一个汤匙，总量不超过20g，建议使用植物油
         2. 每天食用适量的盐，每次食用3g，大约是一个小勺，总量不超过6g"""
-        
-        
+
+
 def cn_whole_grains_guideline():
     return """
         粗粮有玉米、小米、红米、黑米、紫米、高粱、大麦、燕麦、荞麦、黄豆、绿豆、红豆、黑豆、青豆、蚕豆、豌豆、芸豆、山药、红薯、土豆等。"""
-        
-        
+
+
 def cn_example():
     return """
         Should intake 1850kcal/day, 71g protein/day, 70g fat/day, 150 to 175g carb/day
