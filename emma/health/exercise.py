@@ -68,8 +68,11 @@ async def get_exercise_summary(
             & (ExerciseDatabase.type == DB_INTENSITY[intensity])
         )
     # calcualte caories. Check ExerciseDatabase for the formula
+    print(exercise)
+    print(DB_INTENSITY[intensity])
     if not exercise_data:
         met = 0.0  # Default value
+        print("here")
     else:
         met = exercise_data.calories
     # user_data = UserBasicInfo(**user_data_response.json())
@@ -78,6 +81,7 @@ async def get_exercise_summary(
     calories = cal_calories_met(
         float(user_data.cur_weight), float(duration), float(met)
     )
+    print(calories)
     conditions = ", ".join(
         [f"{c.condition} (Level {c.cond_level})" for c in user_data.conditions]
     )
