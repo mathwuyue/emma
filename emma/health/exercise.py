@@ -16,6 +16,9 @@ from .model import EmmaComment, UserBasicInfo
 
 dotenv.load_dotenv()
 
+DB_INTENSITY = {1: "gentle", 2: "low", 3: "moderate", 4: "high", 5: "intense"}
+LLM_INTENSITY = {1: "舒缓", 2: "中等", 3: "激烈", 4: "极限"}
+
 
 def cal_calories_met(weight: float, duration: float, met: float) -> float:
     return 0.0175 * met * duration * weight
@@ -62,7 +65,7 @@ async def get_exercise_summary(
     with db.atomic():
         exercise_data = ExerciseDatabase.get_or_none(
             (ExerciseDatabase.exercise == exercise)
-            & (ExerciseDatabase.type == intensity)
+            & (ExerciseDatabase.type == DB_INTENSITY[intensity])
         )
     # calcualte caories. Check ExerciseDatabase for the formula
     if not exercise_data:
@@ -80,7 +83,7 @@ async def get_exercise_summary(
     )
     new_record = {
         "exercise": exercise,
-        "intensity": intensity,
+        "intensity": LLM_INTENSITY[intensity],
         "duration": duration,
         "calories": calories,
         "bpm": bpm,
