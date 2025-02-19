@@ -18,7 +18,7 @@ dotenv.load_dotenv()
 
 
 def cal_calories_met(weight: float, duration: float, met: float) -> float:
-    met * duration / 60 * 1.05 * weight
+    return 0.0175 * met * duration * weight
 
 
 def cal_max_bpm(age: int) -> float:
