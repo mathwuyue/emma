@@ -104,6 +104,7 @@ async def get_exercise_summary(
     llm_json = extract_json_from_text(await llm(prompt, is_text=True))
     if not calories:
         calories = llm_json["calories"]
+    print(llm_json)
     return EmmaComment(**llm_json), calories
 
 
