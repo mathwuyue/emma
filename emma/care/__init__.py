@@ -1,1 +1,1 @@
-from .physicalexam import exam_report_ocr
+from .physicalexam import exam_report_ocr, generate_physicalexam_list
