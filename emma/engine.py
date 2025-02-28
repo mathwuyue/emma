@@ -38,7 +38,7 @@ TEST_CONTENT = """你是一个营养助手，请个一名身高1.77，孕前体�
 超过50字 2. 具体的食谱 3. 制定该食谱的合理性和引用的文献、数据 4. 选择的产品。输出格式要求：1. 采用markdown格式输出。 2. 食谱和选择的产品为两个不同section，用 # 区别 3. 合理使用markdown的文字和段落格式，使得输出更易于阅读 4. 产品选择为列表，每一个列表项为 [!<pid>][<desc>] 5.只需要输出markdown就可以，无需其他内容。以下是产品列表：<product> 1. <pid>634</pid><desc>叶酸</desc> 2. <pid>633</pid><desc>维生素C</desc> </product>"""
 
 global TEST_IMG_CONTENT
-TEST_IMG_CONTENT = """你需要给用户介绍测血压的方法。注意，在<img>标签中以JSON格式给出了一系列图片，其中url是图片URL，description是图片的介绍。使用不超过150字简要回答用户问题，在回答中根据图片描述引用合适图片。
+TEST_IMG_CONTENT = """你需要给用户介绍测血压的方法。注意，在<img>标签中以JSON格式给出了一系列图片，其中url是图片URL，description是图片的介绍。使用不超过150字简要回答用户问题，在回答中根据图片描述引用合适图片。回复格式为Markdown格式。\n
 <img>{"url":"https://mall-xiyue.oss-cn-hangzhou.aliyuncs.com/emmaimgs/xueya1.jpeg", "description":"血压测量方法"}\n{"url":"https://mall-xiyue.oss-cn-hangzhou.aliyuncs.com/emmaimgs/1.jpg", "description":"血糖仪的用法"}\n</img>
 """
 
