@@ -53,5 +53,5 @@ prompt = Template(
 
 async def emma_daily_dietary(cuisine="闽菜"):
     query = prompt.render(cuisine=cuisine)
-    dietary_data = await llm(query, is_test=True)
+    dietary_data = await llm(query, is_text=True)
     return extract_json_from_text(dietary_data)
