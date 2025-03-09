@@ -1,5 +1,5 @@
-from typing import Dict, Any, Optional, List
 from datetime import datetime
+from typing import Any, Dict, List, Optional
 
 from model.userinfo import BasicInfo, UserPreferenceData
 from pydantic import BaseModel, Field
@@ -7,9 +7,14 @@ from pydantic import BaseModel, Field
 
 class CurrentWeight(BaseModel):
     weight: float = Field(..., description="Current weight")
-    bmi: float = Field(..., description="BMI")
+    bmi: float = Field(..., description="BMI before pregancy")
     remark: Optional[str] = Field(None, description="Remark")
     timestamp: datetime = Field(..., description="Timestamp")
+    exp_weight_min: float = Field(0, description="Expected weight min")
+    exp_weight_max: float = Field(0, description="Expected weight max")
+    exp_timestamp: datetime = Field(
+        datetime(1970, 1, 1), description="exp weight timestamp"
+    )
 
 
 class GestationalWeek(BaseModel):
@@ -25,6 +30,7 @@ class Complications(BaseModel):
     is_diabetes: bool = Field(..., description="Diabetes")
     is_multiple_pregnancy: bool = Field(..., description="Multiple pregnancy")
     is_retinopathy: bool = Field(..., description="Retinopathy")
+    timestamp: datetime = Field(..., description="Timestamp")
 
 
 class RecordFrequency(BaseModel):
@@ -32,14 +38,38 @@ class RecordFrequency(BaseModel):
     remark: Optional[str] = Field(None, description="Remark")
 
 
+class Period(BaseModel):
+    lmp: str = Field(
+        default="2021-01-01", description="Last menstrual period，末次月经第一天"
+    )
+    period_cycle: int = Field(default=28, description="月经周期")
+    is_regular: bool = Field(default=True, description="月经是否规律")
+
+
+class Preference(BaseModel):
+    cuisine: List[str] = Field(default=["闽菜"], description="Cuisine")
+    like: List[str] = Field(default=["海鲜"], description="Like")
+    dislike: List[str] = Field(default=["水果"], description="Dislike")
+    timestamp: datetime = Field(default=datetime.now(), description="Timestamp")
+
+
 class HumanMeta(BaseModel):
-    pre_weight: float = Field(None, description="Previous weight")
-    cur_weight: CurrentWeight = Field(..., description="Current weight")
-    gestational_week: GestationalWeek = Field(..., description="Gestational week")
+    age: int = Field(default=25, description="Age")
+    address: str = Field(default="上海市", description="Address")
+    height: float = Field(default=1.77, description="Height in m")
+    pre_weight: float = Field(default=59.3, description="Previous weight")
+    bmi: float = Field(default=18.9, description="BMI before pregnancy")
+    cur_weight: CurrentWeight = Field(default=59.3, description="Current weight")
+    period: Period = Field(default=Period(), description="Period")
+    gestational_week: GestationalWeek = Field(default=0, description="Gestational week")
+    due_date: str = Field(default="2021-10-08", description="预产期")
+    is_twins: bool = Field(default=False, description="是否为双胞胎")
+    # exercise: int = Field(default=2, description="运动强度, 1-4")
     complications: Complications = Field(..., description="Complications")
     record_frequency: RecordFrequency = Field(..., description="Record frequency")
     food_frequency: RecordFrequency = Field(..., description="Food frequency")
     exercise_frequency: RecordFrequency = Field(..., description="Exercise frequency")
+    preference: Preference = Field(..., description="Preference")
 
 
 # class HumanMeta:
