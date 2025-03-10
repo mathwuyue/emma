@@ -1,1 +1,1 @@
-from meta import HumanMeta, set_humanmeta
+from .meta import HumanMeta, set_humanmeta
