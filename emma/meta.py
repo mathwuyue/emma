@@ -42,7 +42,7 @@ class Period(BaseModel):
     lmp: str = Field(
         default="2021-01-01", description="Last menstrual period，末次月经第一天"
     )
-    period_cycle: int = Field(default=28, description="月经周期")
+    cycle: int = Field(default=28, description="月经周期")
     is_regular: bool = Field(default=True, description="月经是否规律")
 
 
@@ -70,6 +70,13 @@ class HumanMeta(BaseModel):
     food_frequency: RecordFrequency = Field(..., description="Food frequency")
     exercise_frequency: RecordFrequency = Field(..., description="Exercise frequency")
     preference: Preference = Field(..., description="Preference")
+
+
+def set_humanmeta(human_meta: HumanMeta, datafield: str, value: Any) -> None:
+    """Set a specific field in human meta"""
+    setattr(human_meta, datafield, value)
+    human_meta.save()
+    return human_meta
 
 
 # class HumanMeta:
