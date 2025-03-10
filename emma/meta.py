@@ -72,10 +72,26 @@ class HumanMeta(BaseModel):
     preference: Preference = Field(..., description="Preference")
 
 
-def set_humanmeta(human_meta: HumanMeta, datafield: str, value: Any) -> None:
-    """Set a specific field in human meta"""
-    setattr(human_meta, datafield, value)
-    human_meta.save()
+def set_humanmeta(
+    human_meta: HumanMeta, datafield_or_dict: Any, value: Any = None
+) -> HumanMeta:
+    """Set fields in human meta
+
+    Args:
+        human_meta: HumanMeta object
+        datafield_or_dict: Either a string field name or a dictionary of field-value pairs
+        value: Value to set if datafield_or_dict is a string field name
+
+    Returns:
+        Updated HumanMeta object
+    """
+    if value is not None:
+        # Case 1: Three arguments (field name and value)
+        setattr(human_meta, datafield_or_dict, value)
+    else:
+        # Case 2: Two arguments (dict of field-value pairs)
+        for field, val in datafield_or_dict.items():
+            setattr(human_meta, field, val)
     return human_meta
 
 
