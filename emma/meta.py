@@ -25,12 +25,17 @@ class GestationalWeek(BaseModel):
 
 class Complications(BaseModel):
     is_gestational_hypertension: bool = Field(
-        ..., description="Gestational hypertension"
+        False, description="Gestational hypertension"
     )
-    is_diabetes: bool = Field(..., description="Diabetes")
-    is_multiple_pregnancy: bool = Field(..., description="Multiple pregnancy")
-    is_retinopathy: bool = Field(..., description="Retinopathy")
-    timestamp: datetime = Field(..., description="Timestamp")
+    is_diabetes: bool = Field(False, description="Diabetes")
+    is_multiple_pregnancy: bool = Field(False, description="Multiple pregnancy")
+    is_retinopathy: bool = Field(False, description="Retinopathy")
+    is_cvd: bool = Field(False, description="Heart disease")
+    is_renal_disease: bool = Field(False, description="Renal disease")
+    is_hepatic_disease: bool = Field(False, description="Hepatic disease")
+    is_anemia: bool = Field(False, description="Anemia")
+    is_cancer: bool = Field(False, description="Cancer")
+    timestamp: datetime = Field(False, description="Timestamp")
 
 
 class RecordFrequency(BaseModel):
