@@ -20,7 +20,7 @@ class CurrentWeight(BaseModel):
 class GestationalWeek(BaseModel):
     gestational_week: int = Field(..., description="Gestational week")
     timestamp: datetime = Field(..., description="Timestamp")
-    type: str = Field(..., description="0: LMP, 1: Ultrasound, 2: calculated")
+    type: int = Field(..., description="0: LMP, 1: Ultrasound, 2: calculated")
 
 
 class Complications(BaseModel):
