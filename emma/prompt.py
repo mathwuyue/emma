@@ -672,7 +672,7 @@ def emma_format_chat(query, content):
 
 
 @prompt
-def exam_report_ocr_prompt():
+def exam_report_ocr_prompt(lang="中文"):
     """You are an experienced doctor. You will be provided with a set of images, which are physical examination reports of the user.
     - You need to extract the information defined in <report></report> in JSON style.
     - The images are of the following types: 1. Blood test report 2. Urine test report 3. STS report 4. downsyndrome report 5. Ultrasound report 6. ECG report 7. HBV report 8. HCV report 9. HIV report.
@@ -680,10 +680,12 @@ def exam_report_ocr_prompt():
     - For all numerical values, you should extract the value and turn it into correct unit. For example, if femur_length is 3.6cm, you should extract it as 36.
     - Only fill the number into the numerical values. Do not include the unit in the extracted value.
     - For STS, downsyndrome, HBV, HCV, HIV reports, you need to extract the overall result as "result".
+    - Be careful of image contains "报告解读", "医生建议", "注意事项", "结果分析", "结果" and other words which indicates the result and overall analysis of the report. Extract this information as {"DoctorAdvice": "advice"}.
     - Only fill out the information defined in <report></report>. If the information is not available in images, leave it blank.
     - Re-exmine the extracted before return the results. Try not to miss any information and NEVER inference any information that is not in images. This is very important to the user. \n
+    - All results should be in the language {{ lang }}. \n
     <report>
-        {"CBC": {"wbc", "rbc", "hgb", "hct", "mcv", "mch", "mchc", "rdw", "plt", "gran", "lym", "mon", "eos", "bas", "lym_percentage", "mon_percentage", "gran_percentage", "eos_percentage", "bas_percentage", "abo", "rh"}, "Urine": {"color", "transparency", "sg", "ph", "pro", "glu", "ket", "bld", "nit", "leu", "urbi", "bil", "rbc"}, "TORCH": {"toxo_igg", "toxo_igm", "rub_igg", "rub_igm", "cmv_igg", "cmv_igm", "hsv1_igg"}, "STS": {"result", "rpr", "trust", "tppa", "tp_elisa"}, "DownSyndromeScreening": {"result", "free_bhcg_mom", "papp_a_mom", "afp_mom", "ue3_mom", "inhibin_a_mom"}, "VaginalSecretion": {"vaginal"}, "HIVSerology": {"result"}, "UltrasoundReport": {"result", "fetal_heart_rate", "amniotic_fluid_index", "gestational_sac", "biparietal_diameter", "abdominal_circumference", "femur_length","crown_rump_length","nt_measurement","head_circumference","cord", "spine", "placental_position", "fetal_position", "estimated_fetal_weight"}, "ECGReport": {"result"}, "HBVTest": {"result", "hbsag", "hbsab", "hbeag", "hbcab", "hbv_dna"}, "HCVTest": {"result"}, "GestationalDiabetes": {"fasting_glucose", "1h_glucose", "2h_glucose", "3h_glucose", "hba1c"}}
+        {"CBC": {"wbc", "rbc", "hgb", "hct", "mcv", "mch", "mchc", "rdw", "plt", "gran", "lym", "mon", "eos", "bas", "lym_percentage", "mon_percentage", "gran_percentage", "eos_percentage", "bas_percentage", "abo", "rh"}, "Urine": {"color", "transparency", "sg", "ph", "pro", "glu", "ket", "bld", "nit", "leu", "urbi", "bil", "rbc"}, "TORCH": {"toxo_igg", "toxo_igm", "rub_igg", "rub_igm", "cmv_igg", "cmv_igm", "hsv1_igg"}, "STS": {"result", "rpr", "trust", "tppa", "tp_elisa"}, "DownSyndromeScreening": {"result", "free_bhcg_mom", "papp_a_mom", "afp_mom", "ue3_mom", "inhibin_a_mom"}, "VaginalSecretion": {"vaginal"}, "HIVSerology": {"result"}, "UltrasoundReport": {"result", "fetal_heart_rate", "amniotic_fluid_index", "gestational_sac", "biparietal_diameter", "abdominal_circumference", "femur_length","crown_rump_length","nt_measurement","head_circumference","cord", "spine", "placental_position", "fetal_position", "estimated_fetal_weight"}, "ECGReport": {"result"}, "HBVTest": {"result", "hbsag", "hbsab", "hbeag", "hbcab", "hbv_dna"}, "HCVTest": {"result"}, "GestationalDiabetes": {"fasting_glucose", "1h_glucose", "2h_glucose", "3h_glucose", "hba1c"}, "DoctorAdvice": {"advice"}}
     </report>
     """
 
