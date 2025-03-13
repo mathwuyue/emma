@@ -35,7 +35,7 @@ class Complications(BaseModel):
     is_hepatic_disease: bool = Field(False, description="Hepatic disease")
     is_anemia: bool = Field(False, description="Anemia")
     is_cancer: bool = Field(False, description="Cancer")
-    timestamp: datetime = Field(False, description="Timestamp")
+    timestamp: datetime = Field(datetime(1970, 1, 1), description="Timestamp")
 
 
 class RecordFrequency(BaseModel):
