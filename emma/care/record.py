@@ -85,8 +85,8 @@ def cal_exp_weight(humanmeta: HumanMeta) -> HumanMeta:
     max_weight = round(max_weight, 1)
 
     # Update humanmeta with the calculated expected weight range
-    humanmeta.cur_weight.exp_min_weight = min_weight
-    humanmeta.cur_weight.exp_max_weight = max_weight
+    humanmeta.cur_weight.exp_weight_min = min_weight
+    humanmeta.cur_weight.exp_weight_max = max_weight
     humanmeta.cur_weight.exp_timestamp = now
 
     return humanmeta
