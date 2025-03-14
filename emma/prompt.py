@@ -683,10 +683,36 @@ def exam_report_ocr_prompt(lang="中文"):
     - Be careful of image contains "报告解读", "医生建议", "注意事项", "结果分析", "结果" and other words which indicates the result and overall analysis of the report. Extract this information as {"DoctorAdvice": "advice"}.
     - Only fill out the information defined in <report></report>. If the information is not available in images, leave it blank.
     - Re-exmine the extracted before return the results. Try not to miss any information and NEVER inference any information that is not in images. This is very important to the user. \n
-    - All results should be in the language {{ lang }}. \n
+    - The extracted information should be in the language {{ lang }}. \n
+    - You should always output the extracted information in correct JSON format as defined in <report>. \n
     <report>
         {"CBC": {"wbc", "rbc", "hgb", "hct", "mcv", "mch", "mchc", "rdw", "plt", "gran", "lym", "mon", "eos", "bas", "lym_percentage", "mon_percentage", "gran_percentage", "eos_percentage", "bas_percentage", "abo", "rh"}, "Urine": {"color", "transparency", "sg", "ph", "pro", "glu", "ket", "bld", "nit", "leu", "urbi", "bil", "rbc"}, "TORCH": {"toxo_igg", "toxo_igm", "rub_igg", "rub_igm", "cmv_igg", "cmv_igm", "hsv1_igg"}, "STS": {"result", "rpr", "trust", "tppa", "tp_elisa"}, "DownSyndromeScreening": {"result", "free_bhcg_mom", "papp_a_mom", "afp_mom", "ue3_mom", "inhibin_a_mom"}, "VaginalSecretion": {"vaginal"}, "HIVSerology": {"result"}, "UltrasoundReport": {"result", "fetal_heart_rate", "amniotic_fluid_index", "gestational_sac", "biparietal_diameter", "abdominal_circumference", "femur_length","crown_rump_length","nt_measurement","head_circumference","cord", "spine", "placental_position", "fetal_position", "estimated_fetal_weight"}, "ECGReport": {"result"}, "HBVTest": {"result", "hbsag", "hbsab", "hbeag", "hbcab", "hbv_dna"}, "HCVTest": {"result"}, "GestationalDiabetes": {"fasting_glucose", "1h_glucose", "2h_glucose", "3h_glucose", "hba1c"}, "DoctorAdvice": {"advice"}}
     </report>
+    """
+
+
+@prompt
+def emma_daily_nutrient(meal_data, guideline, lang="中文"):
+    """
+    You are an expert in nutrition and food. You will provide nutrition support to preganent woman.
+    The user's daily meal data is given in the json format: \n
+    ```json
+    {{ meal_data }}
+    ```
+    Here are the guidelines for the user to intake nutrients: \n
+    ```json
+    {{ guideline }}
+    ```
+    You should always follow the instructions: \n
+    1. Give a brief summary of the user's daily nutrient intake. \n
+    2. Check the user's daily nutrient intake against the guidelines. \n
+    3. If the user's daily nutrient intake does not meet the guidelines, provide suggestions for improvement. \n
+    4. If the user's daily nutrient intake meets the guidelines, encourage the user to keep up the good work. \n
+    5. Combine the summary and suggestions into a concise response <resp> no more than 128 words. \n
+    5. Your response should be in the language {{ lang }} and in the JSON format: \n
+    ```json
+    {"summary": <resp>}
+    ```
     """
 
 

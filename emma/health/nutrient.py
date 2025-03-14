@@ -14,7 +14,12 @@ from capybara.llm import llm
 from fastapi import HTTPException
 
 from ..logger import logger
-from ..prompt import emma_glu_summary, get_food_info_prompt, get_food_nutrients_prompt
+from ..prompt import (
+    emma_daily_nutrient,
+    emma_glu_summary,
+    get_food_info_prompt,
+    get_food_nutrients_prompt,
+)
 from ..utils import extract_json_from_text
 from .model import NutritionMacro, NutritionMicro, NutritionMineral, UserBasicInfo
 
@@ -74,6 +79,70 @@ async def analyze_nutrient(
         raise e
 
 
+async def analyze_daily_food(meal_data, userinfo):
+    """
+    Analyze daily food intake to get the nutrition data
+    """
+    daily_nutrient_guideline = {
+        "calories": cal_calories_gdm(
+            userinfo["bmi"], userinfo["pre_weight"], userinfo["is_twin"], userinfo["ga"]
+        ),
+        "protein": cal_protein(userinfo["ga"]),
+        "carb": 175,
+        "fat": 14.4,
+        "fa": 60,
+        "vc": 85,
+        "vd": 600,
+        "calcium": 1000,
+        "iron": 27,
+        "zinc": 11,
+        "iodine": 220,
+    }
+    # Compare with guidelines and create results
+    result = []
+    # Process macro nutrients (calories, protein, carb, fat)
+    for nutrient in ["calories", "protein", "carb", "fat"]:
+        result.append(
+            {
+                "name": nutrient,
+                "current": meal_data[nutrient],
+                "exp": daily_nutrient_guideline[nutrient],
+                "label": (
+                    0 if meal_data[nutrient] < daily_nutrient_guideline[nutrient] else 2
+                ),
+            }
+        )
+    # Process other nutrients (micro nutrients and minerals)
+    for nutrient in ["fa", "vc", "vd", "calcium", "iron", "zinc", "iodine"]:
+        result.append(
+            {
+                "name": nutrient,
+                "current": meal_data[nutrient],
+                "exp": daily_nutrient_guideline[nutrient],
+                "label": (
+                    2 if meal_data[nutrient] < daily_nutrient_guideline[nutrient] else 0
+                ),
+            }
+        )
+    try:
+        prompt = emma_daily_nutrient(
+            json.dumps(result).decode(),
+            json.dumps(daily_nutrient_guideline).decode(),
+        )
+        resp = await llm(prompt, is_text=True)
+        result["emma"] = extract_json_from_text(resp)
+    except Exception as e:
+        error_traceback = traceback.format_exc()
+        logger.error(
+            f"Failed to generate dietary recommendation: {str(e)}\n{error_traceback}"
+        )
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to generate dietary recommendation: {str(e)}",
+        )
+    return result
+
+
 # async def dietary_recommendation(
 #     user_id: str,
 # ) -> list[DietarySummary, list[DietaryData]]:
@@ -118,29 +187,6 @@ def cal_protein(ga: int) -> int:
     if ga <= 12:
         return 46
     return 71
-
-
-# def set_user_preferences(user_id: str, preferences: UserPreferenceData) -> None:
-#     try:
-#         # Serialize preferences to dictionary
-#         preferences_dict = preferences.model_dump()
-#         # Extract appetite from preferences
-#         appetite = preferences.appetite
-#         user_pref, created = UserPreference.get_or_create(
-#             userid=user_id,
-#             defaults={"preference": preferences_dict, "appetite": appetite},
-#         )
-#         if not created:
-#             user_pref.preference = preferences_dict
-#             user_pref.appetite = appetite
-#             user_pref.save()
-#     except Exception as e:
-#         error_traceback = traceback.format_exc()
-#         logger.error(f"Failed to get user preferences: {str(e)}\n{error_traceback}")
-#         raise HTTPException(
-#             status_code=500,
-#             detail=f"Failed to generate dietary recommendation: {str(e)}",
-#         )
 
 
 # def get_user_preferences(user_id: str) -> UserPreferenceData:
