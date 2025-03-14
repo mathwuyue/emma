@@ -75,8 +75,13 @@ async def workflow(
     event_id = "chatcmpl-" + r.get("fp").decode() + "-" + str(r.incr("event_num"))
     if "#test%" in query.content:
         resp = await llm(TEST_CONTENT, model="qwen-max", stream=True)
+        resp_chunk = ""
         async for chunk in resp:
+            resp_chunk += chunk.choices[0].delta.content
             yield chunk
+        # Save the response to Redis
+        key = f"{config['user_id']}:assistant:ans"
+        r.set(key, resp_chunk, ex=120)
         return
     elif "#img%" in query.content:
         resp = await llm(TEST_IMG_CONTENT, model="qwen-max", stream=True)
