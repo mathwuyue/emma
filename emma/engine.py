@@ -123,7 +123,12 @@ async def workflow(
     elif int(choice.get("choice")) == 2:
         print("food & nutrition")
         emma_nutrition_agent = ChatAgent(
-            AgentConfig(user_id=config["user_id"], session_id=config["session_id"])
+            AgentConfig(
+                user_id=config["user_id"],
+                session_id=config["session_id"],
+                is_save_query=False,
+                is_save_assistant=False,
+            )
         )
         emma_format_agent = ChatAgent(
             AgentConfig(user_id=config["user_id"], session_id=config["session_id"])
@@ -142,7 +147,10 @@ async def workflow(
             question, 0, "default", emma_nutrition, context
         ):
             response = chunk.choices[0].message.content
-            resp_json = extract_json_from_text(response)
+            try:
+                resp_json = extract_json_from_text(response)
+            except:
+                resp_json = {"message": response}
             async for format_chunk in emma_format_agent.act(
                 question,
                 0,
