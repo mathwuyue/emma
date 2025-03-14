@@ -79,7 +79,7 @@ async def analyze_nutrient(
         raise e
 
 
-async def analyze_daily_food(meal_data, userinfo):
+async def analyze_daily_food(meal_data, userinfo, is_emma=False):
     """
     Analyze daily food intake to get the nutrition data
     """
@@ -124,16 +124,20 @@ async def analyze_daily_food(meal_data, userinfo):
                 ),
             }
         )
-    try:
-        prompt = emma_daily_nutrient(
-            json.dumps(result).decode(),
-            json.dumps(daily_nutrient_guideline).decode(),
-        )
-        resp = await llm(prompt, is_text=True)
-        result["emma"] = extract_json_from_text(resp)
-    except Exception as e:
-        error_traceback = traceback.format_exc()
-        print(f"Failed to generate dietary recommendation: {str(e)}\n{error_traceback}")
+    if is_emma:
+        try:
+            prompt = emma_daily_nutrient(
+                json.dumps(meal_data).decode(),
+                json.dumps(daily_nutrient_guideline).decode(),
+            )
+            resp = await llm(prompt, is_text=True)
+            result["emma"] = extract_json_from_text(resp)
+        except Exception as e:
+            error_traceback = traceback.format_exc()
+            print(
+                f"Failed to generate dietary recommendation: {str(e)}\n{error_traceback}"
+            )
+            print(resp)
     return result
 
 
