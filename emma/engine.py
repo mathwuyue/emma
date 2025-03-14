@@ -77,7 +77,8 @@ async def workflow(
         resp = await llm(TEST_CONTENT, model="qwen-max", stream=True)
         resp_chunk = ""
         async for chunk in resp:
-            resp_chunk += chunk.choices[0].delta.content
+            if chunk.choices[0].delta.content:
+                resp_chunk += chunk.choices[0].delta.content
             yield chunk
         # Save the response to Redis
         key = f"{config['user_id']}:assistant:ans"
