@@ -1,10 +1,9 @@
-from capybara.llm import llm
-
-from ..prompt import exam_report_ocr_prompt
-from ..utils import extract_json_from_text
-
 from datetime import datetime, timedelta
 
+from capybara.llm import llm
+
+from ..prompt import emma_report_comment, exam_report_ocr_prompt
+from ..utils import extract_json_from_text
 
 physicalexam_ga = [6, 12, 13, 17, 21, 25, 29, 33, 36, 37, 38, 39, 40]
 physicalexam_notice = [
@@ -103,3 +102,9 @@ async def exam_report_ocr(pic_urls: list) -> str:
     ]
     response = await llm(query, model="qwen-vl-max", temperature=0.1, is_text=True)
     return extract_json_from_text(response)
+
+
+async def exam_report_analysis(report):
+    prompt = emma_report_comment(report=report)
+    result = await llm(prompt, temperature=0.1, is_text=True)
+    return result

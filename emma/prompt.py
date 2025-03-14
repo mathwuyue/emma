@@ -683,12 +683,36 @@ def exam_report_ocr_prompt(lang="中文"):
     - Be careful of image contains "报告解读", "医生建议", "注意事项", "结果分析", "结果" and other words which indicates the result and overall analysis of the report. Extract this information as {"DoctorAdvice": "advice"}.
     - Only fill out the information defined in <report></report>. If the information is not available in images, leave it blank.
     - Re-exmine the extracted before return the results. Try not to miss any information and NEVER inference any information that is not in images. This is very important to the user. \n
-    - Finally, you should summarize the extracted information and give a brief comment, about what is abnormal and what should take care. Set this as {"Emma": "advice"} \n
     - The extracted information should be in the language {{ lang }}. \n
     - You should always output the extracted information in correct JSON format as defined in <report>. \n
     <report>
-        {"CBC": {"wbc", "rbc", "hgb", "hct", "mcv", "mch", "mchc", "rdw", "plt", "gran", "lym", "mon", "eos", "bas", "lym_percentage", "mon_percentage", "gran_percentage", "eos_percentage", "bas_percentage", "abo", "rh"}, "Urine": {"color", "transparency", "sg", "ph", "pro", "glu", "ket", "bld", "nit", "leu", "urbi", "bil", "rbc"}, "TORCH": {"toxo_igg", "toxo_igm", "rub_igg", "rub_igm", "cmv_igg", "cmv_igm", "hsv1_igg"}, "STS": {"result", "rpr", "trust", "tppa", "tp_elisa"}, "DownSyndromeScreening": {"result", "free_bhcg_mom", "papp_a_mom", "afp_mom", "ue3_mom", "inhibin_a_mom"}, "VaginalSecretion": {"vaginal"}, "HIVSerology": {"result"}, "UltrasoundReport": {"result", "fetal_heart_rate", "amniotic_fluid_index", "gestational_sac", "biparietal_diameter", "abdominal_circumference", "femur_length","crown_rump_length","nt_measurement","head_circumference","cord", "spine", "placental_position", "fetal_position", "estimated_fetal_weight"}, "ECGReport": {"result"}, "HBVTest": {"result", "hbsag", "hbsab", "hbeag", "hbcab", "hbv_dna"}, "HCVTest": {"result"}, "GestationalDiabetes": {"fasting_glucose", "1h_glucose", "2h_glucose", "3h_glucose", "hba1c"}, "DoctorAdvice": {"advice"}, "Emma": {"advice"}}
+        {"CBC": {"wbc", "rbc", "hgb", "hct", "mcv", "mch", "mchc", "rdw", "plt", "gran", "lym", "mon", "eos", "bas", "lym_percentage", "mon_percentage", "gran_percentage", "eos_percentage", "bas_percentage", "abo", "rh"}, "Urine": {"color", "transparency", "sg", "ph", "pro", "glu", "ket", "bld", "nit", "leu", "urbi", "bil", "rbc"}, "TORCH": {"toxo_igg", "toxo_igm", "rub_igg", "rub_igm", "cmv_igg", "cmv_igm", "hsv1_igg"}, "STS": {"result", "rpr", "trust", "tppa", "tp_elisa"}, "DownSyndromeScreening": {"result", "free_bhcg_mom", "papp_a_mom", "afp_mom", "ue3_mom", "inhibin_a_mom"}, "VaginalSecretion": {"vaginal"}, "HIVSerology": {"result"}, "UltrasoundReport": {"result", "fetal_heart_rate", "amniotic_fluid_index", "gestational_sac", "biparietal_diameter", "abdominal_circumference", "femur_length","crown_rump_length","nt_measurement","head_circumference","cord", "spine", "placental_position", "fetal_position", "estimated_fetal_weight"}, "ECGReport": {"result"}, "HBVTest": {"result", "hbsag", "hbsab", "hbeag", "hbcab", "hbv_dna"}, "HCVTest": {"result"}, "GestationalDiabetes": {"fasting_glucose", "1h_glucose", "2h_glucose", "3h_glucose", "hba1c"}, "DoctorAdvice": {"advice"}}
     </report>
+    """
+
+
+@prompt
+def emma_report_comment(report, lang="中文"):
+    """
+    You are an experienced doctor. You will be provided physical examination reports of a preganent woman in JSON format, enclosed in <report></report>. \n
+    You should provide a concise comment on the report. \n
+
+    ## Instructions
+    1. You should carefully find out the abnormal values in the report. \n
+    2. You then consider how those value may impact the user's health. \n
+    3. Generate a short notice (less than 10 words) to the user as <notice>, which concludes 1 or 2 most important or severe index in the report. For example, in Downsyndrome report, you find the "risk of downsyndrome is high". If everything is fine, the notice should be "一切正常". Be careful, this is important to the user. \n
+    4. Choose from 1-3 as <sign> for the user, which 1 indicates "一切正常", 2 indicates moderate risk for the user, 3 indicates high risk for the user. \n
+    5. Finally, you should give concise comment on the reports and suggestions to the user to improve the health in no more than 128 words. \n
+
+    ## Tools
+    - You can search the web like WHO guidelines or other medical guidelines to give suggestions. \n
+
+    ## Output
+    1. You should always output the comment in the language {{ lang }}. \n
+    2. You should always output the comment in JSON format. \n
+    ```json
+    {"emma": {"notice": <notice>, "sign": <sign>", "comment": "string"}
+    ```
     """
 
 
