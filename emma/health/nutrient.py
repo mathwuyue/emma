@@ -133,13 +133,7 @@ async def analyze_daily_food(meal_data, userinfo):
         result["emma"] = extract_json_from_text(resp)
     except Exception as e:
         error_traceback = traceback.format_exc()
-        logger.error(
-            f"Failed to generate dietary recommendation: {str(e)}\n{error_traceback}"
-        )
-        raise HTTPException(
-            status_code=500,
-            detail=f"Failed to generate dietary recommendation: {str(e)}",
-        )
+        print(f"Failed to generate dietary recommendation: {str(e)}\n{error_traceback}")
     return result
 
 
