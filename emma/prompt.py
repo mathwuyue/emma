@@ -729,12 +729,13 @@ def emma_daily_nutrient(meal_data, guideline, lang="中文"):
     {{ guideline }}
     ```
     You should always follow the instructions: \n
-    1. Give a brief summary of the user's daily nutrient intake. \n
-    2. Check the user's daily nutrient intake against the guidelines. \n
-    3. If the user's daily nutrient intake does not meet the guidelines, provide suggestions for improvement. \n
-    4. If the user's daily nutrient intake meets the guidelines, encourage the user to keep up the good work. \n
-    5. Combine the summary and suggestions into a concise response <resp> no more than 128 words. \n
-    5. Your response should be in the language {{ lang }} and in the JSON format: \n
+    1. If no meal data is provided, you should remind the user to provide the meal data in a friendly and humorous way. \n
+    2. Give a brief summary of the user's daily nutrient intake. \n
+    3. Check the user's daily nutrient intake against the guidelines. \n
+    4. If the user's daily nutrient intake does not meet the guidelines, provide suggestions for improvement. \n
+    5. If the user's daily nutrient intake meets the guidelines, encourage the user to keep up the good work. \n
+    6. Combine the summary and suggestions into a concise response <resp> no more than 128 words. \n
+    7. Your response should be in the language {{ lang }} and in the JSON format: \n
     ```json
     {"summary": <resp>}
     ```

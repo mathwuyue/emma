@@ -87,7 +87,7 @@ async def analyze_daily_food(meal_data, userinfo, is_emma=False):
         "calories": cal_calories_gdm(
             userinfo["bmi"], userinfo["pre_weight"], userinfo["is_twin"], userinfo["ga"]
         ),
-        "protein": cal_protein(userinfo["ga"]),
+        "protein": int(cal_protein(userinfo["ga"])),
         "carb": 175,
         "fat": 14.4,
         "fa": 60,
@@ -131,7 +131,7 @@ async def analyze_daily_food(meal_data, userinfo, is_emma=False):
                 json.dumps(daily_nutrient_guideline).decode(),
             )
             resp = await llm(prompt, is_text=True)
-            result["emma"] = extract_json_from_text(resp)
+            result.append(extract_json_from_text(resp))
         except Exception as e:
             error_traceback = traceback.format_exc()
             print(
