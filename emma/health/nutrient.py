@@ -84,8 +84,13 @@ async def analyze_daily_food(meal_data, userinfo, is_emma=False):
     Analyze daily food intake to get the nutrition data
     """
     daily_nutrient_guideline = {
-        "calories": cal_calories_gdm(
-            userinfo["bmi"], userinfo["pre_weight"], userinfo["is_twin"], userinfo["ga"]
+        "calories": int(
+            cal_calories_gdm(
+                userinfo["bmi"],
+                userinfo["pre_weight"],
+                userinfo["is_twin"],
+                userinfo["ga"],
+            )
         ),
         "protein": int(cal_protein(userinfo["ga"])),
         "carb": 175,
@@ -120,7 +125,7 @@ async def analyze_daily_food(meal_data, userinfo, is_emma=False):
                 "current": meal_data[nutrient],
                 "exp": daily_nutrient_guideline[nutrient],
                 "label": (
-                    2 if meal_data[nutrient] < daily_nutrient_guideline[nutrient] else 0
+                    1 if meal_data[nutrient] < daily_nutrient_guideline[nutrient] else 0
                 ),
             }
         )
