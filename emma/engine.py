@@ -8,6 +8,7 @@ import redis
 from capybara.agent import AgentConfig, ChatAgent, NullAgent
 from capybara.llm import llm
 from capybara.router import RouterOptions, UserIntentionRouter
+from jinja2 import Template
 from pydantic import BaseModel
 from utils import extract_json_from_text
 
@@ -67,6 +68,13 @@ user_intents = [
 options = RouterOptions(options=user_intents)
 
 
+sys_prompt = Template(
+    """
+You are a helpful assistant. User's input is {{ input }}. Always respond in the language exactly the same as {{ input }}. This is very important to the user
+"""
+)
+
+
 async def workflow(
     query: Query, config: str, **kwargs
 ) -> AsyncGenerator[Dict[str, Any], None]:
@@ -100,6 +108,16 @@ async def workflow(
     question = query.content
     choice = await router.classify(question)
     print("choice:", choice)
+    # Render system prompt template with user question
+    sys_msg = sys_prompt.render(input=question)
+    # Initialize agent based on rendered prompt
+    agent = ChatAgent(
+        AgentConfig(
+            user_id=config["user_id"],
+            session_id=config["session_id"],
+            system_prompt=rendered_prompt,
+        )
+    )
     if choice.get("message"):
         print("Others")
         agent = NullAgent(
@@ -120,7 +138,7 @@ async def workflow(
         # }
         context = {}
         async for chunk in emma_dietary_agent.act(
-            question, 0, "default", emma_nutrition, context, stream=False
+            question, 0, sys_msg, "default", emma_nutrition, context, stream=False
         ):
             response = chunk.choices[0].message.content
             resp_json = extract_json_from_text(response)
@@ -150,7 +168,7 @@ async def workflow(
         # }
         context = {}
         async for chunk in emma_nutrition_agent.act(
-            question, 0, "default", emma_nutrition, context
+            question, 0, sys_msg, "default", emma_nutrition, context
         ):
             response = chunk.choices[0].message.content
             try:
@@ -160,6 +178,7 @@ async def workflow(
             async for format_chunk in emma_format_agent.act(
                 question,
                 0,
+                sys_msg,
                 "default",
                 emma_format_chat,
                 {"content": resp_json["message"]},
@@ -180,12 +199,24 @@ async def workflow(
             ga_weeks = userinfo["ga"]
         if config["is_thought"]:
             async for chunk in emma_future_agent.act(
-                question, 0, "default", emma_future, {"context": ga_weeks}, stream=True
+                question,
+                0,
+                sys_msg,
+                "default",
+                emma_future,
+                {"context": ga_weeks},
+                stream=True,
             ):
                 yield chunk
         else:
             async for chunk in emma_future_agent.act(
-                question, 0, "default", emma_future, {"context": ga_weeks}, stream=False
+                question,
+                0,
+                sys_msg,
+                "default",
+                emma_future,
+                {"context": ga_weeks},
+                stream=False,
             ):
                 response = chunk.choices[0].message.content
             resp_json = extract_json_from_text(response)
@@ -200,12 +231,12 @@ async def workflow(
         userinfo = "暂无"
         if config["is_thought"]:
             async for chunk in emma_agent.act(
-                question, 0, "default", emma_fitness, stream=True
+                question, 0, sys_msg, "default", emma_fitness, stream=True
             ):
                 yield chunk
         else:
             async for chunk in emma_agent.act(
-                question, 0, "default", emma_fitness, stream=False
+                question, 0, sys_msg, "default", emma_fitness, stream=False
             ):
                 resp_json = extract_json_from_text(chunk.choices[0].message.content)
             chunk.choices[0].message.content = resp_json["message"]
@@ -216,7 +247,7 @@ async def workflow(
             AgentConfig(user_id=config["user_id"], session_id=config["session_id"])
         )
         async for chunk in emma_chat_agent.act(
-            question, 0, "default", emma_chat, stream=True
+            question, 0, sys_msg, "default", emma_chat, stream=True
         ):
             yield chunk
 
