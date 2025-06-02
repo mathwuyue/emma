@@ -110,14 +110,6 @@ async def workflow(
     print("choice:", choice)
     # Render system prompt template with user question
     sys_msg = sys_prompt.render(input=question)
-    # Initialize agent based on rendered prompt
-    agent = ChatAgent(
-        AgentConfig(
-            user_id=config["user_id"],
-            session_id=config["session_id"],
-            system_prompt=rendered_prompt,
-        )
-    )
     if choice.get("message"):
         print("Others")
         agent = NullAgent(
