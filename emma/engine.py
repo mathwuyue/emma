@@ -122,13 +122,12 @@ async def workflow(
         emma_dietary_agent = ChatAgent(
             AgentConfig(user_id=config["user_id"], session_id=config["session_id"])
         )
-        # context = {
-        #     "userinfo": kwargs.get("userinfo"),
-        #     "food_preference": kwargs.get("food_preference", ""),
-        #     "glu_summary": kwargs.get("glu_summary", ""),
-        #     "products": kwargs.get("products", ""),
-        # }
-        context = {}
+        context = {
+            "userinfo": kwargs.get("userinfo"),
+            "food_preference": kwargs.get("food_preference", ""),
+            "glu_summary": kwargs.get("glu_summary", ""),
+            "products": kwargs.get("products", ""),
+        }
         async for chunk in emma_dietary_agent.act(
             question, 0, sys_msg, "default", emma_nutrition, context, stream=False
         ):
