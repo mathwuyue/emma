@@ -49,7 +49,7 @@ async def analyze_food(image_url: str, userinfo: str, history: str) -> list[dict
 
 
 async def analyze_nutrient(
-    food, userinfo, meal_type: int, products: str = "", model="qwen2.5-instruct-awq"
+    food, userinfo, meal_type: int, products: str = "", model=os.getenv("MODEL")
 ) -> list[NutritionMacro, NutritionMicro, NutritionMineral]:
     if type(userinfo) is str:
         userinfo = {"pre_weight": 59.3, "is_twin": False, "height": 1.77, "ga": 12}
