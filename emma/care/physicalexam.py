@@ -91,20 +91,164 @@ def generate_physicalexam_list(lmp: str) -> list:
     return physical_exam_list
 
 
-async def exam_report_ocr(pic_urls: list) -> str:
-    prompt = exam_report_ocr_prompt()
-    query = [{"type": "text", "text": prompt}] + [
-        {
-            "type": "image_url",
-            "image_url": {"url": url},
-        }
-        for url in pic_urls
-    ]
-    response = await llm(query, model="qwen-vl-max", temperature=0.1, is_text=True)
-    return extract_json_from_text(response)
+class ReportAnalysis:
+    def __init__(self, report=None):
+        self.report = report
 
+    # This lets you do: a.data = c
+    @property
+    def data(self):
+        return self.report
 
-async def exam_report_analysis(report):
-    prompt = emma_report_comment(report=report)
-    result = await llm(prompt, temperature=0.1, is_text=True)
-    return result
+    @data.setter
+    def data(self, report):
+        self.report = report
+
+    @staticmethod
+    async def exam_report_ocr(pic_urls: list) -> str:
+        prompt = exam_report_ocr_prompt()
+        query = [{"type": "text", "text": prompt}] + [
+            {
+                "type": "image_url",
+                "image_url": {"url": url},
+            }
+            for url in pic_urls
+        ]
+        response = await llm(query, model="qwen-vl-max", temperature=0.1, is_text=True)
+        return extract_json_from_text(response)
+
+    @staticmethod
+    async def exam_report_analysis(report):
+        prompt = emma_report_comment(report=report)
+        result = await llm(prompt, temperature=0.1, is_text=True)
+        return result
+
+    def process_report(self):
+        if not self.report:
+            return {}
+        # Process urine field
+        self.process_urine_field(self.report)
+        # Process CBC field
+        self.process_cbc_field(self.report)
+        return self.report
+
+    def _is_value_in_range(self, value, min_val, max_val):
+        return min_val <= value <= max_val
+
+    def process_urine_field(self, json_object):
+        urine = json_object.get("Urine")
+        if urine is None:
+            print("urine field is null")
+            return json_object
+
+        # 定义常量范围值
+        SG_MIN, SG_MAX = 1.003, 1.030  # 比重范围
+        PH_MIN, PH_MAX = 4.5, 8.0  # 酸碱度范围
+        RBC_MIN, RBC_MAX = 0, 23  # 红细胞范围
+        LEU_MIN, LEU_MAX = 0, 25  # 白细胞范围
+
+        for entry in urine:
+            try:
+                value = float(entry.get("data"))
+                label = entry.get("label")
+                if label == "sg":
+                    entry["result"] = (
+                        "正常"
+                        if self._is_value_in_range(value, SG_MIN, SG_MAX)
+                        else "不正常"
+                    )
+                elif label == "ph":
+                    entry["result"] = (
+                        "正常"
+                        if self._is_value_in_range(value, PH_MIN, PH_MAX)
+                        else "不正常"
+                    )
+                elif label == "rbc":
+                    entry["result"] = (
+                        "正常"
+                        if self._is_value_in_range(value, RBC_MIN, RBC_MAX)
+                        else "不正常"
+                    )
+                elif label == "leu":
+                    entry["result"] = (
+                        "正常"
+                        if self._is_value_in_range(value, LEU_MIN, LEU_MAX)
+                        else "不正常"
+                    )
+            except (ValueError, TypeError):
+                # entry["result"] = "数据格式错误"
+                pass
+        return json_object
+
+    def process_cbc_field(self, json_object):
+        cbc = json_object.get("CBC")
+        if cbc is None:
+            print("cbc field is null")
+            return json_object
+
+        # 定义常量范围值
+        RBC_MIN, RBC_MAX = 3.80, 5.10  # 红细胞计数范围
+        HGB_MIN, HGB_MAX = 115, 150  # 血红蛋白范围
+        HCT_MIN, HCT_MAX = 35.0, 45.0  # 红细胞比积范围
+        MCV_MIN, MCV_MAX = 82, 100  # 红细胞平均体积范围
+        MCH_MIN, MCH_MAX = 27.0, 34.0  # 红细胞平均血红蛋白量范围
+        MCHC_MIN, MCHC_MAX = 316, 354  # 红细胞平均血红蛋白浓度范围
+        RDW_MIN, RDW_MAX = 11.9, 14.5  # 红细胞分布宽度范围
+        PLT_MIN, PLT_MAX = 125, 350  # 血小板范围
+
+        for entry in cbc:
+            try:
+                value = float(entry.get("data"))
+                label = entry.get("label")
+                if label == "rbc":
+                    entry["result"] = (
+                        "正常"
+                        if self._is_value_in_range(value, RBC_MIN, RBC_MAX)
+                        else "不正常"
+                    )
+                elif label == "hgb":
+                    entry["result"] = (
+                        "正常"
+                        if self._is_value_in_range(value, HGB_MIN, HGB_MAX)
+                        else "不正常"
+                    )
+                elif label == "hct":
+                    entry["result"] = (
+                        "正常"
+                        if self._is_value_in_range(value, HCT_MIN, HCT_MAX)
+                        else "不正常"
+                    )
+                elif label == "mcv":
+                    entry["result"] = (
+                        "正常"
+                        if self._is_value_in_range(value, MCV_MIN, MCV_MAX)
+                        else "不正常"
+                    )
+                elif label == "mch":
+                    entry["result"] = (
+                        "正常"
+                        if self._is_value_in_range(value, MCH_MIN, MCH_MAX)
+                        else "不正常"
+                    )
+                elif label == "mchc":
+                    entry["result"] = (
+                        "正常"
+                        if self._is_value_in_range(value, MCHC_MIN, MCHC_MAX)
+                        else "不正常"
+                    )
+                elif label == "rdw":
+                    entry["result"] = (
+                        "正常"
+                        if self._is_value_in_range(value, RDW_MIN, RDW_MAX)
+                        else "不正常"
+                    )
+                elif label == "plt":
+                    entry["result"] = (
+                        "正常"
+                        if self._is_value_in_range(value, PLT_MIN, PLT_MAX)
+                        else "不正常"
+                    )
+            except (ValueError, TypeError):
+                # entry["result"] = "数据格式错误"
+                pass
+        return json_object
