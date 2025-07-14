@@ -678,6 +678,8 @@ def exam_report_ocr_prompt(lang="中文"):
     ## instructions
     - You need to extract the information from the image defined in <report></report> in one or more JSONs. One report for one JSON. DO NOT OUTPUT JSON not related to the reports in the given image. \n
     - The reports contained in the image are of the following types: 1. Blood test report 2. Urine test report 3. STS report 4. downsyndrome report 5. Ultrasound report 6. ECG report 7. HBV report 8. HCV report 9. HIV report, as defined in <report> tag. \n
+    - If the image contains reports that are not defined in <report> tag, you should ignore them and do not output any information about them. \n
+    - If the image contains multiple reports, you should extract each report separately and output them in a list of JSONs. \n
     - For Ultrasound report, you firstly extract the whole report content as "result". Then extract the following information from "result": fetal_heart_rate (in beats per minute), amniotic_fluid_index, gestational_sac in mm, biparietal_diameter in mm, abdominal_circumference in mm, femur_length in mm, crown_rump_length in mm, nt_measurement in mm, head_circumference in mm, cord, spine, placental_position, fetal_position, estimated_fetal_weight in g.
     - For STS, downsyndrome, HBV, HCV, HIV reports, you need to extract the overall result as "result".
     - Be careful of image contains "报告解读", "医生建议", "注意事项", "结果分析", "结果" and other words which indicates the result and overall analysis of the report. Extract this information and summarized the key parts: 1. overall result; 2. problem, if any; 3. advice, if any. as {"DoctorAdvice": "advice"}, in less than 128 words. \n
@@ -689,31 +691,31 @@ def exam_report_ocr_prompt(lang="中文"):
     \n
     <report>
     ```json
-        {"CBC": {"wbc", "rbc", "hgb", "hct", "mcv", "mch", "mchc", "rdw", "plt", "gran", "lym", "mon", "eos", "bas", "lym_percentage", "mon_percentage", "gran_percentage", "eos_percentage", "bas_percentage", "abo", "rh"} \n
+        {"CBC": {"wbc": <float>, "rbc": <float>, "hgb": <float>, "hct": <float>, "mcv": <float>, "mch": <float>, "mchc": <float>, "rdw": <float>, "plt": <float>, "gran": <float>, "lym": <float>, "mon": <float>, "eos": <float>, "bas": <float>, "lym_percentage": <float>, "mon_percentage": <float>, "gran_percentage": <float>, "eos_percentage": <float>, "bas_percentage": <float>, "abo": <string>, "rh": <string>} \n
     ```json
-        "Urine": {"color", "transparency", "sg", "ph", "pro", "glu", "ket", "bld", "nit", "leu", "urbi", "bil", "rbc"} \n
+        "Urine": {"color": <string>, "transparency": <string>, "sg": <float>, "ph": <float>, "pro": <string>, "glu": <string>, "ket": <string>, "bld": <string>, "nit": <string>, "leu": <string>, "urbi": <string>, "bil": <string>, "rbc": <string>} \n
     ```json
-        "TORCH": {"toxo_igg", "toxo_igm", "rub_igg", "rub_igm", "cmv_igg", "cmv_igm", "hsv1_igg"} \n
+        "TORCH": {"toxo_igg": <string>, "toxo_igm": <string>, "rub_igg": <string>, "rub_igm": <string>, "cmv_igg": <string>, "cmv_igm": <string>, "hsv1_igg": <string>} \n
     ```json
-        "STS": {"result", "rpr", "trust", "tppa", "tp_elisa"} \n
+        "STS": {"result": <string>, "rpr": <string>, "trust": <string>, "tppa": <string>, "tp_elisa": <string>} \n
     ```json
-        "DownSyndromeScreening": {"result", "free_bhcg_mom", "papp_a_mom", "afp_mom", "ue3_mom", "inhibin_a_mom"} \n
+        "DownSyndromeScreening": {"result": <string>, "free_bhcg_mom": <float>, "papp_a_mom": <float>, "afp_mom": <float>, "ue3_mom": <float>, "inhibin_a_mom": <float>} \n
     ```json
-        "VaginalSecretion": {"vaginal"} \n
+        "VaginalSecretion": {"vaginal": <string>} \n
     ```json
-        "HIVSerology": {"result"} \n
+        "HIVSerology": {"result": <string>} \n
     ```json
-        "UltrasoundReport": {"result", "fetal_heart_rate", "amniotic_fluid_index", "gestational_sac", "biparietal_diameter", "abdominal_circumference", "femur_length","crown_rump_length","nt_measurement","head_circumference","cord", "spine", "placental_position", "fetal_position", "estimated_fetal_weight"} \n
+        "UltrasoundReport": {"result": <string>, "fetal_heart_rate": <float>, "amniotic_fluid_index": <float>, "gestational_sac": <float>, "biparietal_diameter": <float>, "abdominal_circumference": <float>, "femur_length": <float>,"crown_rump_length": <float>,"nt_measurement": <float>,"head_circumference": <float>,"cord": <string>, "spine": <string>, "placental_position": <string>, "fetal_position": <string>, "estimated_fetal_weight": <float>} \n
     ```json
-        "ECGReport": {"result"} \n
+        "ECGReport": {"result": <string>} \n
     ```json
-        "HBVTest": {"result", "hbsag", "hbsab", "hbeag", "hbcab", "hbv_dna"} \n
+        "HBVTest": {"result": <string>, "hbsag": <string>, "hbsab": <string>, "hbeag": <string>, "hbcab": <string>, "hbv_dna": <string>} \n
     ```json
-        "HCVTest": {"result"} \n
+        "HCVTest": {"result": <string>} \n
     ```json
-        "GestationalDiabetes": {"fasting_glucose", "1h_glucose", "2h_glucose", "3h_glucose", "hba1c"} \n
+        "GestationalDiabetes": {"fasting_glucose": <float>, "1h_glucose": <float>, "2h_glucose": <float>, "3h_glucose": <float>, "hba1c": <float>} \n
     ```json
-        "DoctorAdvice": {"advice"} \n
+        "DoctorAdvice": {"advice": <string>} \n
     </report>
     """
 
