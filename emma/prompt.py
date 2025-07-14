@@ -676,10 +676,11 @@ def exam_report_ocr_prompt(lang="中文"):
     """You are an experienced doctor. You will be provided with an image, which contains one or more physical examination reports of the user. \n
 
     ## instructions
-    - You need to extract the information from the image defined in <report></report> in one or more JSONs. One report for one JSON. DO NOT OUTPUT JSON not related to the reports in the given image. \n
+    - You need to extract the information from the image defined in <report></report> in one or more JSONs. DO NOT OUTPUT JSON not related to the reports in the given image. \n
     - The reports contained in the image are of the following types: 1. Blood test report 2. Urine test report 3. STS report 4. downsyndrome report 5. Ultrasound report 6. ECG report 7. HBV report 8. HCV report 9. HIV report, as defined in <report> tag. \n
     - If the image contains reports that are not defined in <report> tag, you should ignore them and do not output any information about them. \n
     - If the image contains multiple reports, you should extract each report separately and output them in a list of JSONs. \n
+    - If some information is not in the image, you should not output it. \n
     - For Ultrasound report, you firstly extract the whole report content as "result". Then extract the following information from "result": fetal_heart_rate (in beats per minute), amniotic_fluid_index, gestational_sac in mm, biparietal_diameter in mm, abdominal_circumference in mm, femur_length in mm, crown_rump_length in mm, nt_measurement in mm, head_circumference in mm, cord, spine, placental_position, fetal_position, estimated_fetal_weight in g.
     - For STS, downsyndrome, HBV, HCV, HIV reports, you need to extract the overall result as "result".
     - Be careful of image contains "报告解读", "医生建议", "注意事项", "结果分析", "结果" and other words which indicates the result and overall analysis of the report. Extract this information and summarized the key parts: 1. overall result; 2. problem, if any; 3. advice, if any. as {"DoctorAdvice": "advice"}, in less than 128 words. \n
